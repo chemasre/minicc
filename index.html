@@ -3,6 +3,7 @@
 <head>
 <script src="scripts/parser.js"></script>
 <script src="scripts/syntax.js"></script>
+<script src="scripts/codegen.js"></script>
 </head>
 <body>
 <div style="width:100%; padding: 10pt"><button type="button" id="compile" onclick="Compile()">Compile</button></div>
@@ -12,14 +13,14 @@
 </textarea>
 <textarea id="tree" style="float:left; margin:10pt" rows="200" cols="60">
 </textarea>
+<textarea id="code" style="float:left; margin:10pt" rows="200" cols="30">
+</textarea>
 <script>
-
-var registerCount = 3;
-var registerNames = ["A", "B", "C"];
 
 var sourceElement;
 var tokensElement;
 var treeElement;
+var codeElement;
 
 function Compile()
 {
@@ -37,8 +38,17 @@ function Compile()
 	
 	var treeText = PrintTree(tree);
 	
+	var result = CodeGen(tree);
+	
+	if(result == null) { return; }
+	
+	
 	tokensElement.value = "-----------Tokens-----------\n" + tokensText;
     treeElement.value = "-----------TreeNodes-----------\n" + treeText;
+
+    codeElement.value = "------Memory-------\n" + result[0];
+    codeElement.value += "------Code--------\n" + result[1];
+	
 
 	
 }
@@ -46,6 +56,7 @@ function Compile()
 sourceElement = document.getElementById("source");
 tokensElement = document.getElementById("tokens");
 treeElement = document.getElementById("tree");
+codeElement = document.getElementById("code");
 
 
 </script>

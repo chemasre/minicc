@@ -385,7 +385,7 @@ function BuildExpressionRecursive(tokens)
 			else // tokenType == tokenTypeLiteral
 			{ nodeType = nodeTypeLiteral; }
 			
-			node = { type: nodeType, childs: [], content: null };
+			node = { type: nodeType, childs: [], content: tokenContent };
 		}
 		else
 		{
