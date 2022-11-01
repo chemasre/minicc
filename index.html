@@ -1,9 +1,38 @@
 <!DOCTYPE html>
 <html>
 <head>
+<title>MiniCC - Version 0.01</title>
 <script src="scripts/parser.js"></script>
 <script src="scripts/syntax.js"></script>
 <script src="scripts/codegen.js"></script>
+<style>
+
+@font-face {
+  font-family: 'machineFont';
+  src: url('fonts/ibmplex.ttf') format('truetype');
+}
+
+body
+{
+	background-color: rgb(233,199,138);
+	background-image: url('images/background.png');
+}
+
+body, textarea
+{
+	font-family: 'machineFont', monospace;
+	font-size:10pt;
+}
+
+textarea
+{
+	padding:16pt;
+	border-style:none;
+	background-color:rgb(250,250,245);
+	color:rgb(50,50,50);
+	box-shadow: 2pt 2pt 4pt rgba(0,0,0,0.6)
+}
+</style>
 </head>
 <body>
 <div style="width:100%; padding: 10pt"><button type="button" id="compile" onclick="Compile()">Compile</button></div>
