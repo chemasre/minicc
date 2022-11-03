@@ -72,11 +72,11 @@ function Compile()
 	if(result == null) { return; }
 	
 	
-	tokensElement.value = "-----------Tokens-----------\n" + tokensText;
-    treeElement.value = "-----------TreeNodes-----------\n" + treeText;
+	tokensElement.value = "---------- Tokens ---------\n\n" + tokensText;
+    treeElement.value =   "------- Syntax Tree ------\n\n" + treeText;
 
-    codeElement.value = "------Memory-------\n" + result[0];
-    codeElement.value += "------Code--------\n" + result[1];
+    codeElement.value = "------ Memory -------\n\n" + result[0] + "\n";
+    codeElement.value += "------ Code --------\n\n" + result[1];
 	
 
 	

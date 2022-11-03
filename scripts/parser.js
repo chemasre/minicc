@@ -120,28 +120,29 @@ function IsSeparator(c)
 
 function TokenTypeName(type)
 {
-	if(type == tokenTypeLiteral)					{ return "Literal(LIT)"; }
-	else if(type == tokenTypeOpenRoundBracket)      { return "RoundBracketOpen(RBO)"; }
-	else if(type == tokenTypeCloseRoundBracket)     { return "RoundBracketClose(RBC)"; }
-	else if(type == tokenTypeIdentifier)            { return "Identifier(ID)"; }
-	else if(type == tokenTypeEqual)	                { return "Equal(EQ)"; }
-	else if(type == tokenTypeAddition)              { return "Add(ADD)"; }
-	else if(type == tokenTypeMinus)	                { return "Substract(SUB)"; }
-	else if(type == tokenTypeAsterisk)              { return "Asterisk(AST)"; }
-	else if(type == tokenTypeDivision)		        { return "Division(DIV)"; }
-	else if(type == tokenTypeIf)	                { return "If(IF)"; }
-	else if(type == tokenTypeElse)                  { return "Else(ELS)"; }
-	else if(type == tokenTypeWhile)                 { return "While(WHL)"; }
-	else if(type == tokenTypeFor)                   { return "For(FOR)"; }
-	else if(type == tokenTypeOpenClaudator)         { return "ClaudatorOpen(CO)"; }
-	else if(type == tokenTypeCloseClaudator)        { return "ClaudatorClose(CC)"; }
-	else if(type == tokenTypeAddressOf)             { return "Address(ADR)"; }
-	else if(type == tokenTypeComma)                 { return "Comma(COM)"; }
-	else if(type == tokenTypeOpenSquareBracket)     { return "SquareBracketOpen(SBO)"; }
-	else if(type == tokenTypeCloseSquareBracket)    { return "SquareBracketClose(SBC)"; }
-	else if(type == tokenTypeSeparator)				{ return "Separator(SEP)"; }
-	else if(type == tokenTypeEndSentence)			{ return "SentenceEnd(SND)"; }
-	else { return "Unknown"; }
+	if(type == tokenTypeLiteral)					{ return "Literal------------(LIT)"; }
+	else if(type == tokenTypeOpenRoundBracket)      { return "RoundBracketOpen---(RBO)"; }
+	else if(type == tokenTypeCloseRoundBracket)     { return "RoundBracketClose--(RBC)"; }
+	else if(type == tokenTypeIdentifier)            { return "Identifier---------(ID)"; }
+	else if(type == tokenTypeEqual)	                { return "Equal--------------(EQ)"; }
+	else if(type == tokenTypeAddition)              { return "Add----------------(ADD)"; }
+	else if(type == tokenTypeMinus)	                { return "Substract----------(SUB)"; }
+	else if(type == tokenTypeAsterisk)              { return "Asterisk-----------(AST)"; }
+	else if(type == tokenTypeDivision)		        { return "Division-----------(DIV)"; }
+	else if(type == tokenTypeIf)	                { return "If-----------------(IF)"; }
+	else if(type == tokenTypeElse)                  { return "Else---------------(LS)"; }
+	else if(type == tokenTypeWhile)                 { return "While--------------(WHL)"; }
+	else if(type == tokenTypeFor)                   { return "For----------------(FOR)"; }
+	else if(type == tokenTypeOpenClaudator)         { return "ClaudatorOpen------(CLO)"; }
+	else if(type == tokenTypeCloseClaudator)        { return "ClaudatorClose-----(CLC)"; }
+	else if(type == tokenTypeAddressOf)             { return "Address------------(ADR)"; }
+	else if(type == tokenTypeComma)                 { return "Comma--------------(COM)"; }
+	else if(type == tokenTypeOpenSquareBracket)     { return "SquareBracketOpen--(SBO)"; }
+	else if(type == tokenTypeCloseSquareBracket)    { return "SquareBracketClose-(SBC)"; }
+	else if(type == tokenTypeSeparator)				{ return "Separator----------(SEP)"; }
+	else if(type == tokenTypeEndSentence)			{ return "SentenceEnd--------(SND)"; }
+	else { return "Unknown------------(UNK)"; }
+	
 }
 
 function Parse(source)

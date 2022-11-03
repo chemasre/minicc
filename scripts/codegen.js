@@ -89,6 +89,27 @@ function CodeGenExpressionRecursive(node, contextStack)
 		if(findResult != null) { resultVariable = findResult; }
 		else { return null; }
 	}
+	else if(node.type == nodeTypeExpression || node.type == nodeTypeParenthesis)
+	{
+		var subExpressionResult = CodeGenExpressionRecursive(node.childs[0], contextStack);
+		
+		if(subExpressionResult == null)
+		{
+			return null;
+		}
+		else
+		{
+			// add the generated code and memory cells
+			memory += subExpressionResult[0];
+			code += subExpressionResult[1];
+			
+			// pass the returned variable
+			resultVariable = subExpressionResult[2];
+			
+
+		}
+		
+	}
 	else
 	{
 	
@@ -109,34 +130,8 @@ function CodeGenExpressionRecursive(node, contextStack)
 			context.registersSize ++;
 		}
 	
-		if(node.type == nodeTypeExpression || node.type == nodeTypeParenthesis)
-		{
-			var subExpressionResult = CodeGenExpressionRecursive(node.childs[0], contextStack);
-			
-			if(subExpressionResult == null)
-			{
-				return null;
-			}
-			else
-			{
-				memory += subExpressionResult[0];
-				code += subExpressionResult[1];
-				
-				var subExpressionVariable = subExpressionResult[2];
-				
-				code += ":" + context.codeSize + ":MUEVE ";
-				
-				code += CodeGenReference(resultVariable) + " " + CodeGenReference(subExpressionVariable) + "\n";
-
-				context.codeSize ++;
-				
-				code += CodeGenDealocation(subExpressionVariable, context);
-				
-			
-			}
-			
-		}		
-		else if(node.type == nodeTypeAdd || node.type == nodeTypeSub || 
+		
+		if(node.type == nodeTypeAdd || node.type == nodeTypeSub || 
 		        node.type == nodeTypeMul || node.type == nodeTypeDiv)
 		{
 			var subExpressionLeftResult = CodeGenExpressionRecursive(node.childs[0], contextStack);
