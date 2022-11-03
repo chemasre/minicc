@@ -7,6 +7,8 @@ var tokenTextCharacters = ["a", "b", "c", "d", "e", "f", "g", "h", "i", "j",
 							"K", "L", "M", "N", "O", "P", "Q", "R", "S", "T",
 							"U", "V", "W", "X", "Y", "Z"];
 							
+var tokenTextSpecialCharacters = [">", "<", "=", "!", "+", "-", "*", "/", "(", ")", "[", "]", "{", "}", ";"];
+
 var tokenTextSeparators = [" ", "\t", "\n"];
 
 var tokenLineSeparator = "\n";
@@ -14,11 +16,17 @@ var tokenLineSeparator = "\n";
 
 const tokenTextOpenRoundBracket		= "(";
 const tokenTextCloseRoundBracket	= ")";
-const tokenTextEqual 			= "=";
+const tokenTextAssign 				= "=";
 const tokenTextAddition 			= "+";
 const tokenTextMinus				= "-";
 const tokenTextAsterisk				= "*";
 const tokenTextDivision				= "/";
+const tokenTextLess					= "<";
+const tokenTextLessEqual			= "<=";
+const tokenTextGreater				= ">";
+const tokenTextGreaterEqual			= ">=";
+const tokenTextEqual				= "==";
+const tokenTextNotEqual				= "!=";
 const tokenTextIf					= "if";
 const tokenTextElse					= "else";
 const tokenTextWhile				= "while";
@@ -34,29 +42,36 @@ const tokenTypeLiteral				= 0;
 const tokenTypeOpenRoundBracket		= 1;
 const tokenTypeCloseRoundBracket	= 2;
 const tokenTypeIdentifier			= 3;
-const tokenTypeEqual			= 4;
+const tokenTypeAssign				= 4;
 const tokenTypeAddition				= 5;
 const tokenTypeMinus				= 6;
 const tokenTypeAsterisk				= 7;
 const tokenTypeDivision				= 8;
-const tokenTypeIf					= 9;
-const tokenTypeElse					= 10;
-const tokenTypeWhile				= 12;
-const tokenTypeFor					= 13;
-const tokenTypeOpenClaudator		= 14;
-const tokenTypeCloseClaudator		= 15;
-const tokenTypeAddressOf			= 16;
-const tokenTypeComma				= 17;
-const tokenTypeOpenSquareBracket	= 18;
-const tokenTypeCloseSquareBracket	= 19;
-const tokenTypeSeparator			= 20;
-const tokenTypeEndSentence			= 21;
+const tokenTypeGreater				= 9;
+const tokenTypeGreaterEqual			= 10;
+const tokenTypeLess					= 11;
+const tokenTypeLessEqual			= 12;
+const tokenTypeEqual				= 13;
+const tokenTypeNotEqual				= 14;
+const tokenTypeIf					= 15;
+const tokenTypeElse					= 16;
+const tokenTypeWhile				= 17;
+const tokenTypeFor					= 18;
+const tokenTypeOpenClaudator		= 19;
+const tokenTypeCloseClaudator		= 20;
+const tokenTypeAddressOf			= 21;
+const tokenTypeComma				= 22;
+const tokenTypeOpenSquareBracket	= 23;
+const tokenTypeCloseSquareBracket	= 24;
+const tokenTypeSeparator			= 25;
+const tokenTypeEndSentence			= 26;
 
 
 const parserStateWord = 0;
-const parserStateLiteral = 1;
-const parserStateSeparator = 2;
-const parserStateOther = 3;
+const parserStateSpecialWord = 1;
+const parserStateLiteral = 2;
+const parserStateSeparator = 3;
+const parserStateOther = 4;
 
 function IsDigit(c)
 {
@@ -98,6 +113,26 @@ function IsCharacter(c)
 	return result;
 }
 
+function IsSpecialCharacter(c)
+{
+	var result = false;
+
+	var i = 0;
+	while(i < tokenTextSpecialCharacters.length && !result)
+	{
+		if(tokenTextSpecialCharacters[i] == c)
+		{
+			result = true;
+		}
+		else
+		{
+			i++;
+		}
+	}
+		
+	return result;
+}
+
 function IsSeparator(c)
 {
 	var result = false;
@@ -124,11 +159,17 @@ function TokenTypeName(type)
 	else if(type == tokenTypeOpenRoundBracket)      { return "RoundBracketOpen---(RBO)"; }
 	else if(type == tokenTypeCloseRoundBracket)     { return "RoundBracketClose--(RBC)"; }
 	else if(type == tokenTypeIdentifier)            { return "Identifier---------(ID)"; }
-	else if(type == tokenTypeEqual)	                { return "Equal--------------(EQ)"; }
+	else if(type == tokenTypeAssign)	            { return "Assign-------------(ASG)"; }
 	else if(type == tokenTypeAddition)              { return "Add----------------(ADD)"; }
 	else if(type == tokenTypeMinus)	                { return "Substract----------(SUB)"; }
 	else if(type == tokenTypeAsterisk)              { return "Asterisk-----------(AST)"; }
 	else if(type == tokenTypeDivision)		        { return "Division-----------(DIV)"; }
+	else if(type == tokenTypeGreater)               { return "Greater------------(GT)"; }
+	else if(type == tokenTypeGreaterEqual)	        { return "GreaterEqual-------(GE)"; }
+	else if(type == tokenTypeLess)                  { return "Less---------------(LT)"; }
+	else if(type == tokenTypeLessEqual)		        { return "LessEqual----------(LE)"; }
+	else if(type == tokenTypeEqual)                 { return "Equal--------------(EQ)"; }
+	else if(type == tokenTypeNotEqual)		        { return "NotEqual-----------(NEQ)"; }
 	else if(type == tokenTypeIf)	                { return "If-----------------(IF)"; }
 	else if(type == tokenTypeElse)                  { return "Else---------------(LS)"; }
 	else if(type == tokenTypeWhile)                 { return "While--------------(WHL)"; }
@@ -179,6 +220,15 @@ function Parse(source)
 
 				i ++;
 			}			
+			else if(IsSpecialCharacter(c))
+			{
+				tokenText = "";
+				tokenText += c;
+
+				parserState = parserStateSpecialWord;
+				
+				i ++;
+			}
 			else if(IsDigit(c))
 			{
 				tokenText = "";
@@ -196,19 +246,6 @@ function Parse(source)
 				
 				i++;
 			}
-			else if(c == tokenTextOpenRoundBracket)		{ tokens.push([tokenTypeOpenRoundBracket,		""]); i++; }
-			else if(c == tokenTextCloseRoundBracket)	{ tokens.push([tokenTypeCloseRoundBracket,		""]); i++; }
-			else if(c == tokenTextEqual)				{ tokens.push([tokenTypeEqual,					""]); i++; }
-			else if(c == tokenTextAddition)				{ tokens.push([tokenTypeAddition,				""]); i++; }
-			else if(c == tokenTextMinus)				{ tokens.push([tokenTypeMinus,					""]); i++; }
-			else if(c == tokenTextAsterisk)				{ tokens.push([tokenTypeAsterisk,				""]); i++; }
-			else if(c == tokenTextDivision)				{ tokens.push([tokenTypeDivision,				""]); i++; }
-			else if(c == tokenTextOpenClaudator)		{ tokens.push([tokenTypeOpenClaudator, 			""]); i++; }
-			else if(c == tokenTextCloseClaudator)		{ tokens.push([tokenTypeCloseClaudator, 		""]); i++; }
-			else if(c == tokenTextComma)				{ tokens.push([tokenTypeComma, 					""]); i++; }
-			else if(c == tokenTextOpenSquareBracket)	{ tokens.push([tokenTypeOpenSquareBracket, 		""]); i++; }
-			else if(c == tokenTextCloseSquareBracket)	{ tokens.push([tokenTypeCloseSquareBracket,		""]); i++; }
-			else if(c == tokenTextEndSentence)			{ tokens.push([tokenTypeEndSentence,			""]); i++; }
 			else { error = true; errorText = "Símbolo " + c + " no reconocido"; }
 			
 		}
@@ -227,7 +264,7 @@ function Parse(source)
 		}
 		else if(parserState == parserStateWord)		
 		{
-			if(!IsCharacter(c) && !IsDigit(c))
+			if(!IsCharacter(c) && !IsDigit(c) || IsSpecialCharacter(c))
 			{
 				var tokenType;
 			
@@ -257,7 +294,20 @@ function Parse(source)
 				}
 			
 				tokens.push([tokenType, tokenText]);
-				parserState = parserStateOther;
+				
+				if(IsSpecialCharacter(c))
+				{
+					tokenText = "";
+					tokenText += c;
+					
+					i++;
+					
+					parserState = parserStateSpecialWord;
+				}
+				else
+				{
+					parserState = parserStateOther;
+				}
 			}
 			else
 			{
@@ -279,13 +329,48 @@ function Parse(source)
 				i ++;
 			}
 			
-		}	
+		}
+		else if(parserState == parserStateSpecialWord)
+		{
+			if(tokenText == tokenTextOpenRoundBracket)			{ tokens.push([tokenTypeOpenRoundBracket,		""]); tokenText = ""; }
+			else if(tokenText == tokenTextOpenClaudator)		{ tokens.push([tokenTypeOpenClaudator, 			""]); tokenText = ""; }
+			else if(tokenText == tokenTextOpenSquareBracket)	{ tokens.push([tokenTypeOpenSquareBracket, 		""]); tokenText = ""; }
+			else if(!IsSpecialCharacter(c))
+			{
+				if(tokenText == tokenTextCloseRoundBracket)			{ tokens.push([tokenTypeCloseRoundBracket,		""]); }
+				else if(tokenText == tokenTextAssign)				{ tokens.push([tokenTypeAssign,					""]); }
+				else if(tokenText == tokenTextAddition)				{ tokens.push([tokenTypeAddition,				""]); }
+				else if(tokenText == tokenTextMinus)				{ tokens.push([tokenTypeMinus,					""]); }
+				else if(tokenText == tokenTextAsterisk)				{ tokens.push([tokenTypeAsterisk,				""]); }
+				else if(tokenText == tokenTextDivision)				{ tokens.push([tokenTypeDivision,				""]); }
+				else if(tokenText == tokenTextAsterisk)				{ tokens.push([tokenTypeAsterisk,				""]); }
+				else if(tokenText == tokenTextGreater)				{ tokens.push([tokenTypeGreater,				""]); }
+				else if(tokenText == tokenTextGreaterEqual)			{ tokens.push([tokenTypeGreaterEqual,			""]); }
+				else if(tokenText == tokenTextLess)					{ tokens.push([tokenTypeLess,					""]); }
+				else if(tokenText == tokenTextLessEqual)			{ tokens.push([tokenTypeLessEqual,				""]); }
+				else if(tokenText == tokenTextEqual)				{ tokens.push([tokenTypeEqual,					""]); }
+				else if(tokenText == tokenTextNotEqual)				{ tokens.push([tokenTypeNotEqual,				""]); }
+				else if(tokenText == tokenTextCloseClaudator)		{ tokens.push([tokenTypeCloseClaudator, 		""]); }
+				else if(tokenText == tokenTextComma)				{ tokens.push([tokenTypeComma, 					""]); }
+				else if(tokenText == tokenTextCloseSquareBracket)	{ tokens.push([tokenTypeCloseSquareBracket,		""]); }
+				else if(tokenText == tokenTextEndSentence)			{ tokens.push([tokenTypeEndSentence,			""]); }
+
+
+				parserState = parserStateOther;
+			}
+			else
+			{
+				tokenText += c;
+				i ++;				
+			}
+			
+		}
 		
 	}
 	
 	if(error)
 	{
-		console.log("ERROR: Linea " + line + " columna " + i + ": " + errorText);
+		window.alert("ERROR: Linea " + line + " columna " + i + ": " + errorText);
 		
 		return null;
 	}

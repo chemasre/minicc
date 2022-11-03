@@ -15,19 +15,25 @@ const nodeTypeAssignation				= 9;
 const nodeTypeAssignationLeftSide		= 10;
 const nodeTypeExpression				= 11;
 
-const nodeTypeMinusSign = 12;
-const nodeTypeAdd 		= 13;
-const nodeTypeSub 		= 14;
-const nodeTypeMul 		= 15;
-const nodeTypeDiv 		= 16;
-const nodeTypeParenthesis = 17;
-const nodeTypeVar = 18;
-const nodeTypePlusSign = 19;
+const nodeTypeMinusSign     = 12;
+const nodeTypeAdd 		    = 13;
+const nodeTypeSub 		    = 14;
+const nodeTypeMul 		    = 15;
+const nodeTypeDiv 	    	= 16;
+const nodeTypeGreater 	    = 17;
+const nodeTypeGreaterEqual  = 18;
+const nodeTypeLess 		    = 19;
+const nodeTypeLessEqual     = 20;
+const nodeTypeEqual 	    = 21;
+const nodeTypeNotEqual 	    = 22;
+const nodeTypeParenthesis   = 23;
+const nodeTypeVar		    = 24;
+const nodeTypePlusSign	    = 25;
 
-const nodeTypeLiteral = 20;
+const nodeTypeLiteral	    = 26;
 
-const nodeTypeIf = 21;
-const nodeTypeWhile = 22;
+const nodeTypeIf	        = 27;
+const nodeTypeWhile         = 28;
 
 const identifierTypeVarOrFunction = 0;
 const identifierTypeType = 1;
@@ -63,6 +69,12 @@ function NodeTypeName(type)
 	else if(type == nodeTypeSub) { return "Sub(SUB)"}
 	else if(type == nodeTypeMul) { return "Mul(MUL)"}
 	else if(type == nodeTypeDiv) { return "Div(DIV)"}
+	else if(type == nodeTypeGreater) { return "Greater(GT)"}
+	else if(type == nodeTypeGreaterEqual) { return "GreaterEqual(GE)"}
+	else if(type == nodeTypeLess) { return "Less(LT)"}
+	else if(type == nodeTypeLessEqual) { return "LessEqual(GE)"}
+	else if(type == nodeTypeEqual) { return "Equal(EQ)"}
+	else if(type == nodeTypeNotEqual) { return "NotEqual(NEQ)"}
 	else if(type == nodeTypeParenthesis) { return "Parentheses(PAR)"}
 	else if(type == nodeTypeVar) { return "Variable(VAR)"}
 	else if(type == nodeTypePlusSign) { return "PlusSign(PS)"}
@@ -107,7 +119,9 @@ function SkipSeparators(tokens, i)
 
 function IsOperatorTokenType(t)
 {
-	return t == tokenTypeAddition || t == tokenTypeMinus || t == tokenTypeAsterisk || t == tokenTypeDivision || t == tokenTypeOpenRoundBracket;
+	return 	t == tokenTypeAddition || t == tokenTypeMinus || t == tokenTypeAsterisk || t == tokenTypeDivision ||
+			t == tokenTypeGreater || t == tokenTypeGreaterEqual || t == tokenTypeLess || t == tokenTypeLessEqual ||
+			t == tokenTypeOpenRoundBracket;
 }
 
 function FindLeastPrioritaryOperator(tokens, start, end)
@@ -175,13 +189,16 @@ function GetOperatorTokenTypePriority(tokenType, isUnary)
 {
 	if(!isUnary)
 	{
-		if(tokenType == tokenTypeAddition || tokenType == tokenTypeMinus) { return 0; }
-		else if(tokenType == tokenTypeAsterisk || tokenType == tokenTypeDivision) { return 1; }
-		else if(tokenType == tokenTypeOpenRoundBracket) { return 2; }
+		if(tokenType == tokenTypeEqual || tokenType == tokenTypeNotEqual) { return 0; }
+		else if(tokenType == tokenTypeGreater || tokenType == tokenTypeGreaterEqual ||
+		   tokenType == tokenTypeLess || tokenType == tokenTypeLessEqual) { return 1; }		
+		else if(tokenType == tokenTypeAddition || tokenType == tokenTypeMinus) { return 2; }
+		else if(tokenType == tokenTypeAsterisk || tokenType == tokenTypeDivision) { return 3; }
+		else if(tokenType == tokenTypeOpenRoundBracket) { return 4; }
 	}
 	else
 	{
-		if(tokenType == tokenTypeAddition || tokenType == tokenTypeMinus) { return 3; }	
+		if(tokenType == tokenTypeAddition || tokenType == tokenTypeMinus) { return 5; }	
 	}
 	
 	return 0;
@@ -292,6 +309,12 @@ function BuildExpressionRecursive(tokens)
 			else if(tokenType == tokenTypeAddition) { nodeType = nodeTypeAdd; }
 			else if(tokenType == tokenTypeAsterisk) { nodeType = nodeTypeMul; }
 			else if(tokenType == tokenTypeDivision) { nodeType = nodeTypeDiv; }
+			else if(tokenType == tokenTypeGreater) 	{ nodeType = nodeTypeGreater; }
+			else if(tokenType == tokenTypeGreaterEqual) { nodeType = nodeTypeGreaterEqual; }
+			else if(tokenType == tokenTypeLess) 	{ nodeType = nodeTypeLess; }
+			else if(tokenType == tokenTypeLessEqual){ nodeType = nodeTypeLessEqual; }
+			else if(tokenType == tokenTypeEqual) 	{ nodeType = nodeTypeEqual; }
+			else if(tokenType == tokenTypeNotEqual) { nodeType = nodeTypeNotEqual; }
 			else // tokenType == tokenTypeOpenRoundBracket
 			{ nodeType = nodeTypeParenthesis; }
 
@@ -622,7 +645,7 @@ function BuildBlock(tokens, i)
 									
 					i = SkipSeparators(tokens, i);
 					
-					if(tokens[i][0] == tokenTypeEqual)
+					if(tokens[i][0] == tokenTypeAssign)
 					{
 						console.log("Assignation found");
 						

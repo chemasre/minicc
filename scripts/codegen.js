@@ -1,4 +1,5 @@
 const tagPrefixVar = "var";
+const tagPrefixWhile = "while"
 const tagPrefixEndWhile = "endWhile"
 const tagPrefixEndIf = "endIf";
 
@@ -62,7 +63,7 @@ function CodeGenDealocation(variable, context)
 	if(variable[1] == locationTypeRegister) { context.registersSize --; }
 	else if(variable[1] == locationTypeStack)
 	{
-		code += ":" + context.codeSize + ":DESMONTA\n";
+		code += "    :" + context.codeSize + ":DESMONTA\n";
 		context.stackSize --;
 		context.codeSize ++;
 	}
@@ -123,7 +124,7 @@ function CodeGenExpressionRecursive(node, contextStack)
 			resultVariable = MakeVariable("",locationTypeStack, context.stackSize);
 			resultLocation = locationTypeStack;
 			resultOffset = context.stackSize;
-			code += ":" + context.codeSize + ":MONTA\n";		
+			code += "    :" + context.codeSize + ":MONTA\n";		
 			context.stackSize ++;
 			context.codeSize ++;
 		}
@@ -137,7 +138,10 @@ function CodeGenExpressionRecursive(node, contextStack)
 	
 		
 		if(node.type == nodeTypeAdd || node.type == nodeTypeSub || 
-		        node.type == nodeTypeMul || node.type == nodeTypeDiv)
+		        node.type == nodeTypeMul || node.type == nodeTypeDiv ||
+				node.type == nodeTypeGreater || node.type == nodeTypeGreaterEqual ||
+				node.type == nodeTypeLess || node.type == nodeTypeLessEqual ||
+				node.type == nodeTypeEqual || node.type == nodeTypeNotEqual)
 		{
 			var subExpressionLeftResult = CodeGenExpressionRecursive(node.childs[0], contextStack);
 			var subExpressionRightResult = CodeGenExpressionRecursive(node.childs[1], contextStack);
@@ -157,10 +161,16 @@ function CodeGenExpressionRecursive(node, contextStack)
 			if(node.type == nodeTypeAdd) { op = "SUMA"; }
 			else if(node.type == nodeTypeSub) { op = "RESTA"; }
 			else if(node.type == nodeTypeMul) { op = "MULTIPLICA"; }
-			else // node.type == nodeTypeDiv
-			{ op = "DIVIDE"; }
+			else if(node.type == nodeTypeDiv) { op = "DIVIDE"; }
+			else if(node.type == nodeTypeGreater) { op = "MAYOR"; }
+			else if(node.type == nodeTypeGreaterEqual) { op = "MAYORIGUAL"; }
+			else if(node.type == nodeTypeLess) { op = "MENOR"; }
+			else if(node.type == nodeTypeLessEqual) { op = "MENORIGUAL"; }
+			else if(node.type == nodeTypeEqual) { op = "IGUAL"; }
+			else // node.type == nodeTypeNotEqual
+			{ op = "DIFERENTE"; }
 			
-			code += ":" + context.codeSize + ":" + op + " " +
+			code += "    :" + context.codeSize + ":" + op + " " +
 					CodeGenReference(resultVariable) + " " +
 					CodeGenReference(subExpressionLeftVariable) + " " +
 					CodeGenReference(subExpressionRightVariable) + "\n";
@@ -212,7 +222,7 @@ function CodeGenRecursive(node, contextStack)
 		code += expressionResult[1];
 		
 		var endIfTag = tagPrefixEndIf + contextStack[contextStack.length - 1].codeSize;
-		code += ":" + contextStack[contextStack.length - 1].codeSize + ":" +
+		code += "    :" + contextStack[contextStack.length - 1].codeSize + ":" +
 		        "SALTASIFALSO " + endIfTag + " " +
 				CodeGenReference(expressionResult[2]) + "\n";
 				
@@ -233,8 +243,8 @@ function CodeGenRecursive(node, contextStack)
 	}
 	else if(node.type == nodeTypeWhile)
 	{
-		var whileTag = "while" + contextStack[contextStack.length - 1].codeSize;
-		var endWhileTag = "endWhile" + contextStack[contextStack.length - 1].codeSize;
+		var whileTag = tagPrefixWhile + contextStack[contextStack.length - 1].codeSize;
+		var endWhileTag = tagPrefixEndWhile + contextStack[contextStack.length - 1].codeSize;
 		code += whileTag + ":" + contextStack[contextStack.length - 1].codeSize + ":" +
 		        "MUEVE A A\n";
 		contextStack[contextStack.length - 1].codeSize ++;
@@ -244,7 +254,7 @@ function CodeGenRecursive(node, contextStack)
 		memory += expressionResult[0];
 		code += expressionResult[1];
 		
-		code += ":" + contextStack[contextStack.length - 1].codeSize + ":" +
+		code += "    :" + contextStack[contextStack.length - 1].codeSize + ":" +
 		        "SALTASIFALSO " + endWhileTag + " " +
 				CodeGenReference(expressionResult[2]) + "\n";
 				
@@ -255,7 +265,7 @@ function CodeGenRecursive(node, contextStack)
 		memory += blockResult[0];
 		code += blockResult[1];
 		
-		code += ":" + contextStack[contextStack.length - 1].codeSize + ":SALTA " + whileTag + "\n";
+		code += "    :" + contextStack[contextStack.length - 1].codeSize + ":SALTA " + whileTag + "\n";
 				
 		contextStack[contextStack.length - 1].codeSize ++;
 
@@ -344,7 +354,7 @@ function CodeGenRecursive(node, contextStack)
 			contextStack[contextStack.length - 1].vars.push(variable);
 			contextStack[contextStack.length - 1].stackSize ++;
 			
-			code += ":" + contextStack[contextStack.length - 1].codeSize + ":MONTA\n"
+			code += "    :" + contextStack[contextStack.length - 1].codeSize + ":MONTA\n"
 			
 			contextStack[contextStack.length - 1].codeSize ++;
 			
@@ -372,7 +382,7 @@ function CodeGenRecursive(node, contextStack)
 			}
 			else
 			{
-				code += ":" + contextStack[contextStack.length - 1].codeSize + ":MUEVE " +
+				code += "    :" + contextStack[contextStack.length - 1].codeSize + ":MUEVE " +
 						CodeGenReference(variable) + " " + CodeGenReference(expressionVar) + "\n";
 				
 				
