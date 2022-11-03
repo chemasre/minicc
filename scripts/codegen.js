@@ -1,3 +1,6 @@
+const tagPrefixVar = "var";
+const tagPrefixEndWhile = "endWhile"
+const tagPrefixEndIf = "endIf";
 
 var registerCount = 3;
 var registerNames = ["A", "B", "C"];
@@ -42,12 +45,14 @@ function FindVariable(name, contextStack)
 
 function CodeGenReference(variable)
 {
-	if(variable[1] == locationTypeRegister)
+	if(variable[1] == locationTypeLiteral)
+	{ return variable[0]; }
+	else if(variable[1] == locationTypeRegister)
 	{ return "" + registerNames[variable[2]]; }
 	else if(variable[1] == locationTypeStack)
 	{ return "SP[" + variable[2] + "]"; }
-	else // variable[1] == locationTypeStaticMemory || variable[1] == locationTypeLiteral
-	{ return variable[0]; }
+	else // variable[1] == locationTypeStaticMemory
+	{ return tagPrefixVar + variable[0]; }
 }
 
 function CodeGenDealocation(variable, context)
@@ -206,7 +211,7 @@ function CodeGenRecursive(node, contextStack)
 		memory += expressionResult[0];
 		code += expressionResult[1];
 		
-		var endIfTag = "endIf" + contextStack[contextStack.length - 1].codeSize;
+		var endIfTag = tagPrefixEndIf + contextStack[contextStack.length - 1].codeSize;
 		code += ":" + contextStack[contextStack.length - 1].codeSize + ":" +
 		        "SALTASIFALSO " + endIfTag + " " +
 				CodeGenReference(expressionResult[2]) + "\n";
@@ -323,7 +328,7 @@ function CodeGenRecursive(node, contextStack)
 			contextStack[0].vars.push(variable);
 			contextStack[0].staticSize ++;
 			
-			memory += variable[0] + ":" + variable[2] + ":0\n";
+			memory += tagPrefixVar + variable[0] + ":" + variable[2] + ":0\n";
 			
 			return [memory, code];
 				
